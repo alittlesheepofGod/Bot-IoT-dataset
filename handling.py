@@ -24,7 +24,7 @@ from sklearn.preprocessing import LabelEncoder
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-01-2018.csv/03-01-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/dataset.csv"
 
-PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/DDoS/DDoS_HTTP/DDoS_HTTP[1].csv"
+PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/DDoS/DDoS_TCP/DDoS_TCP[1].csv"
 
 
 # open dataset csv file by 'pandas'
@@ -109,6 +109,7 @@ For applying a convolutional neural network on our data, we will have to follow 
 
 """
 
+
 # encode the column labels
 label_encoder = LabelEncoder()
 dataset['Sub_Cat']= label_encoder.fit_transform(dataset['Sub_Cat'])
@@ -171,7 +172,7 @@ p = plt.gcf()
 p.gca().add_artist(circle)
 
 # making X & Y Variables (CNN)
-test_dataset = train_dataset.sample(frac=0.2)
+test_dataset = train_dataset.sample(frac=0.8)
 target_train = train_dataset['Sub_Cat']
 target_test = test_dataset['Sub_Cat']
 target_train.unique(), target_test.unique()

@@ -20,6 +20,9 @@ from tensorflow.keras.optimizers import Adagrad
 from sklearn.preprocessing import Normalizer
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from keras.layers import Dropout
+import tensorflow as tf 
+from tensorflow.keras import regularizers
 
 # import module handling
 import handling 
@@ -65,45 +68,61 @@ X_test = np.resize(X_test, (X_test.shape[0], 72, 1))
 # CNN model
 def model():
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same', input_shape=(72, 1)))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same', kernel_initializer='he_uniform', input_shape=(72, 1)))
+    model.add(BatchNormalization())
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
+    model.add(BatchNormalization())
     # adding a pooling layer
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.1))
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.2))
+
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu'))
+    model.add(Dropout(0.4))
+
+    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
+    model.add(Dropout(0.4))
+
 
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
+    model.add(Dropout(0.5))
     model.add(BatchNormalization())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     # model.add(Dense(4, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
     model.add(Dense(2, activation='sigmoid'))  # number of node in dense layer represent for number of classes to classification
     # model.add(Dense(11, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
 
-    opt = SGD(lr = 0.01, momentum = 0.9, decay = 0.01)
+    opt = SGD(lr = 0.001, momentum = 0.9, decay = 0.01)
     # opt = Adagrad()
+    # model.compile(loss='binary_crossentropy', optimizer = opt, metrics=['accuracy'])
+    
+    model.compile(loss='categorical_crossentropy', optimizer = opt, metrics=['accuracy'])
 
-    model.compile(loss='binary_crossentropy', optimizer = opt, metrics=['accuracy'])
     return model
     # adding a pooling layer 
 
@@ -135,90 +154,91 @@ y_pred = model.predict(X_test)
 # labels = ["Benign", "Brute Force -Web", "Brute Force -XSS", "SQL Injection"]
 # labels = ["Benign", "Bot"]
 # labels = ["Benign", "Infilteration"]
+labels = ["Normal", "DDOS_HTTP"]
 
-# # convert to categorical 
-# from keras.utils.np_utils import to_categorical
-# y_predict = to_categorical(np.argmax(y_pred, 1), dtype="int64")
-# # convert one-hot encoding to integer
-# y_predict = np.argmax(y_predict, axis=1)
-# y_test = np.argmax(y_test, axis=1)
-# cm = confusion_matrix(y_test, y_predict)
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-# disp.plot(cmap=plt.cm.Blues)
-# plt.show()
+# convert to categorical 
+from keras.utils.np_utils import to_categorical
+y_predict = to_categorical(np.argmax(y_pred, 1), dtype="int64")
+# convert one-hot encoding to integer
+y_predict = np.argmax(y_predict, axis=1)
+y_test = np.argmax(y_test, axis=1)
+cm = confusion_matrix(y_test, y_predict)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
+disp.plot(cmap=plt.cm.Blues)
+plt.show()
 
-# # visualize training and val accuracy
-# # plt.figure(figsize=(10, 5))
-# # plt.title('Training and Validation Loss (CNN)')
-# # plt.xlabel('Epochs')
-# # plt.ylabel('Loss')
-# # plt.plot(epochs, loss, label='loss', color='g')
-# # plt.plot(epochs, val_loss, label='val_loss', color='r')
-# # plt.legend()
+# visualize training and val accuracy
+# plt.figure(figsize=(10, 5))
+# plt.title('Training and Validation Loss (CNN)')
+# plt.xlabel('Epochs')
+# plt.ylabel('Loss')
+# plt.plot(epochs, loss, label='loss', color='g')
+# plt.plot(epochs, val_loss, label='val_loss', color='r')
+# plt.legend()
 
-# # list all data in history
-# print(history.history.keys())
-# # summarize history for accuracy
-# plt.plot(history.history['accuracy'])
-# plt.plot(history.history['val_accuracy'])
-# plt.title('model accuracy')
-# plt.ylabel('accuracy')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'test'], loc='upper left')
-# plt.show()
+# list all data in history
+print(history.history.keys())
+# summarize history for accuracy
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
 
-# # summarize history for loss
-# plt.plot(history.history['loss'])
-# plt.plot(history.history['val_loss'])
-# plt.title('model loss')
-# plt.ylabel('loss')
-# plt.xlabel('epoch')
-# plt.legend(['train', 'test'], loc='upper left')
-# plt.show()
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
 
-# # print out accuracy for each class
-# matrix = confusion_matrix(y_test, y_predict)
-# # print("accuracy of benign, DoS attacks-SlowHTTPTest, DoS attacks-Hulk")
-# # print("accuracy of benign, DoS attacks-LOIC-HTTP")
-# # print(" accuracy of Benign, Brute Force -Web, Brute Force -XSS, SQL Injection: ") 
-# print(" accuracy of Benign, Infilteration: ") 
-# print(matrix.diagonal()/matrix.sum(axis=1))
+# print out accuracy for each class
+matrix = confusion_matrix(y_test, y_predict)
+# print("accuracy of benign, DoS attacks-SlowHTTPTest, DoS attacks-Hulk")
+# print("accuracy of benign, DoS attacks-LOIC-HTTP")
+# print(" accuracy of Benign, Brute Force -Web, Brute Force -XSS, SQL Injection: ") 
+print(" accuracy of Normal, DDOS_HTTP: ") 
+print(matrix.diagonal()/matrix.sum(axis=1))
 
-# # print out False Alarm Rate 
-# print("False Alarm Rate is : ")
-# FAR = 0
-# for i in range(1, len(cm[0])):
-#     FAR += cm[0][i]
-# FAR = FAR / (cm[0][0] + FAR)
-# print(FAR)
+# print out False Alarm Rate 
+print("False Alarm Rate is : ")
+FAR = 0
+for i in range(1, len(cm[0])):
+    FAR += cm[0][i]
+FAR = FAR / (cm[0][0] + FAR)
+print(FAR)
 
-# # print detection rate
-# print("Detection Rate is : ")
-# DTrate = 0
-# for i in range(1, len(cm)):
-#     for j in range(0, len(cm[i])):
-#         DTrate += cm[i][j]
+# print detection rate
+print("Detection Rate is : ")
+DTrate = 0
+for i in range(1, len(cm)):
+    for j in range(0, len(cm[i])):
+        DTrate += cm[i][j]
 
-# sum = 0
-# for i in range(1, len(cm)):
-#     sum += cm[i][i]
+sum = 0
+for i in range(1, len(cm)):
+    sum += cm[i][i]
 
-# DTrate = sum / DTrate 
+DTrate = sum / DTrate 
 
-# print(DTrate)
+print(DTrate)
 
-# # Conclusion after CNN Training 
+# Conclusion after CNN Training 
 
-# """
-# After training our deep CNN model on training data and validating it on validation data, it can be 
-# interpreted that:
+"""
+After training our deep CNN model on training data and validating it on validation data, it can be 
+interpreted that:
 
-# + Model was trained on 10 epochs
-# + CNN performed exceptionally well on training data and the accuracy was 99%
-# + Model accuracy was down to 83.55% on validation data after 50 iterations, and gave a good accuracy
-# of 92% after 30 iterations. Thus, it can be interpreted that optimal number of iterations on which this
-# model can perform are 30. --> ... 
++ Model was trained on 10 epochs
++ CNN performed exceptionally well on training data and the accuracy was 99%
++ Model accuracy was down to 83.55% on validation data after 50 iterations, and gave a good accuracy
+of 92% after 30 iterations. Thus, it can be interpreted that optimal number of iterations on which this
+model can perform are 30. --> ... 
 
 
-# """
+"""
 
