@@ -24,6 +24,27 @@ from keras.layers import Dropout
 import tensorflow as tf 
 from tensorflow.keras import regularizers
 
+# import libs for DA
+import os 
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"  
+
+import keras 
+from matplotlib import pyplot as plt 
+import numpy as np 
+import gzip 
+from keras.models import Model 
+from tensorflow.keras.optimizers import RMSprop
+from keras.layers import Input, Dense, Flatten, Dropout, merge, Reshape, Conv2D, MaxPooling2D, UpSampling2D, Conv2DTranspose
+from tensorflow.keras.layers import BatchNormalization 
+from keras.models import Model, Sequential 
+from keras.callbacks import ModelCheckpoint 
+from tensorflow.keras.optimizers import Adadelta, RMSprop, SGD, Adam 
+from keras import regularizers 
+from keras import backend as K 
+from tensorflow.keras.utils import to_categorical 
+
+
 # import module handling
 import handling 
 
@@ -66,64 +87,31 @@ x_test_pca=pca.transform(X_test)
 X_train = np.resize(X_train, (X_train.shape[0], 72, 1))
 X_test = np.resize(X_test, (X_test.shape[0], 72, 1))
 
-# CNN model
-def model():
-    model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same', kernel_initializer='he_uniform', input_shape=(72, 1)))
-    model.add(BatchNormalization())
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    # adding a pooling layer
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.1))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.2))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.2))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.2))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.2))
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.2))
-
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.4))
-
-    model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    # model.add(Dropout(0.4))
+# DA model
+def encoder(input):
+    # encoder 
+    # encoder 
+    conv1 = Conv1D(filters=32, kernel_size=3, activation='relu', padding='same', kernel_initializer='he_uniform', input_shape=(72, 1))(input) # 28x28x32
+    conv1 = BatchNormalization()(conv1)
+    conv1 = Conv1D(filters=32, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4))(conv1)
+    conv1 = BatchNormalization()(conv1)
+    pool1 = MaxPooling1D(pool_size=(3), strides=1, padding='same')(conv1) #14 x 14 x 32
+    conv2 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4))(pool1) #14 x 14 x 64
+    conv2 = BatchNormalization()(conv2)
+    conv2 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)(conv2)
+    conv2 = BatchNormalization()(conv2)
+    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2) #7 x 7 x 64
+    conv3 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)(pool2) #7 x 7 x 128 (small and thick)
+    conv3 = BatchNormalization()(conv3)
+    conv3 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)(conv3)
+    conv3 = BatchNormalization()(conv3)
+    conv4 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)(conv3) #7 x 7 x 256 (small and thick)
+    conv4 = BatchNormalization()(conv4)
+    conv4 = Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)(conv4)
+    conv4 = BatchNormalization()(conv4)
+    return conv4
 
 
-    model.add(Flatten())
-    model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    # model.add(Dropout(0.5))
-    model.add(BatchNormalization())
-    model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
-    # model.add(Dense(4, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
-    model.add(Dense(2, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
-    # model.add(Dense(11, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
-
-    opt = SGD(lr = 0.01, momentum = 0.9, decay = 0.01)
-    # opt = Adagrad()
-    model.compile(loss='binary_crossentropy', optimizer = opt, metrics=['accuracy'])
-    
-    # model.compile(loss='categorical_crossentropy', optimizer = opt, metrics=['accuracy'])
-
-    return model
     # adding a pooling layer 
 
 model = model()
