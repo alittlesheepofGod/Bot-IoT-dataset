@@ -1,6 +1,7 @@
 # import libraries 
 import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import pandas as pd
+from xgboost import train # data processing, CSV file I/O (e.g. pd.read_csv)
 pd.set_option('display.max_columns', None)
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -24,11 +25,14 @@ from sklearn.preprocessing import LabelEncoder
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-01-2018.csv/03-01-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/dataset.csv"
 
-PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/DDoS/DDoS_TCP/DDoS_TCP[1].csv"
-
+PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/Theft/Keylogging/Keylogging.csv"
 
 # open dataset csv file by 'pandas'
 dataset = pd.read_csv(PATH_TO_DATASET)
+
+
+dataset = dataset.replace((np.inf, -np.inf, np.nan), 0).reset_index(drop=True)
+
 
 # get an overview of the data 
 dataset.head()
@@ -172,7 +176,7 @@ p = plt.gcf()
 p.gca().add_artist(circle)
 
 # making X & Y Variables (CNN)
-test_dataset = train_dataset.sample(frac=0.8)
+test_dataset = train_dataset.sample(frac=0.1)
 target_train = train_dataset['Sub_Cat']
 target_test = test_dataset['Sub_Cat']
 target_train.unique(), target_test.unique()

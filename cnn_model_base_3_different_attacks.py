@@ -37,6 +37,7 @@ y_test = handling.y_test
 X_train = np.resize(X_train, (X_train.shape[0], X_train.shape[1]))
 X_test = np.resize(X_test, (X_test.shape[0], X_train.shape[1]))
 
+
 # normalizer
 scaler = Normalizer().fit(X_train)
 X_train = scaler.transform(X_train)
@@ -71,57 +72,56 @@ def model():
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', padding='same', kernel_initializer='he_uniform', input_shape=(72, 1)))
     model.add(BatchNormalization())
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(BatchNormalization())
     # adding a pooling layer
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.1))
+    # model.add(Dropout(0.1))
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.2))
+    # model.add(Dropout(0.2))
 
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.4))
+    # model.add(Dropout(0.4))
 
     model.add(Conv1D(filters=128, kernel_size=1, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     model.add(MaxPooling1D(pool_size=(3), strides=1, padding='same'))
-    model.add(Dropout(0.4))
+    # model.add(Dropout(0.4))
 
 
     model.add(Flatten())
     model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
-    model.add(Dropout(0.5))
+    # model.add(Dropout(0.5))
     model.add(BatchNormalization())
     model.add(Dense(128, activation='relu', kernel_initializer='he_uniform', activity_regularizer=regularizers.l1(1e-4)))
     model.add(BatchNormalization())
     # model.add(Dense(4, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
-    model.add(Dense(2, activation='sigmoid'))  # number of node in dense layer represent for number of classes to classification
+    model.add(Dense(2, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
     # model.add(Dense(11, activation='softmax'))  # number of node in dense layer represent for number of classes to classification
 
-    opt = SGD(lr = 0.001, momentum = 0.9, decay = 0.01)
+    opt = SGD(lr = 0.01, momentum = 0.9, decay = 0.01)
     # opt = Adagrad()
-    # model.compile(loss='binary_crossentropy', optimizer = opt, metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer = opt, metrics=['accuracy'])
     
-    model.compile(loss='categorical_crossentropy', optimizer = opt, metrics=['accuracy'])
+    # model.compile(loss='categorical_crossentropy', optimizer = opt, metrics=['accuracy'])
 
     return model
     # adding a pooling layer 
@@ -129,7 +129,7 @@ def model():
 model = model()
 model.summary()
 
-history = model.fit(X_train, y_train, epochs=50, batch_size=64, validation_data=(X_test, y_test), verbose = 1)
+history = model.fit(X_train, y_train, epochs=10, batch_size=64, validation_data=(X_test, y_test), verbose = 1)
 
 # Visualization of Results (CNN)
 # Let's make a graphical visualization of results obtained by applying CNN to our data 
