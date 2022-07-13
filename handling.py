@@ -9,7 +9,7 @@ from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 
 # path to dataset 
-# PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-14-2018.csv/02-14-2018.csv"
+PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-14-2018.csv/02-14-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-15-2018.csv/02-15-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-16-2018.csv/02-16-2018.csv"
 
@@ -25,7 +25,7 @@ from sklearn.preprocessing import LabelEncoder
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-01-2018.csv/03-01-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/dataset.csv"
 
-PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/Theft/Keylogging/Keylogging.csv"
+# PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/Theft/Keylogging/Keylogging.csv"
 
 # open dataset csv file by 'pandas'
 dataset = pd.read_csv(PATH_TO_DATASET)
@@ -85,7 +85,7 @@ print("shape of dataset : ", dataset.shape)
 print("\n")
 
 # check the number of values for labels 
-print("the number of values for labels : ", dataset['Sub_Cat'].value_counts())
+print("the number of values for labels : ", dataset['Label'].value_counts())
 
 # Data Visualizations 
 
@@ -94,7 +94,7 @@ print("the number of values for labels : ", dataset['Sub_Cat'].value_counts())
 sns.set(rc={'figure.figsize':(12, 6)})
 plt.xlabel('Attack Type')
 sns.set_theme()
-ax = sns.countplot(x='Sub_Cat', data = dataset)
+ax = sns.countplot(x='Label', data = dataset)
 ax.set(xlabel='Attack Type', ylabel='Number of Attack and Benign')
 plt.show()
 
@@ -116,12 +116,13 @@ For applying a convolutional neural network on our data, we will have to follow 
 
 # encode the column labels
 label_encoder = LabelEncoder()
-dataset['Sub_Cat']= label_encoder.fit_transform(dataset['Sub_Cat'])
-dataset['Sub_Cat'].unique()
+dataset['Label']= label_encoder.fit_transform(dataset['Label'])
+dataset['Label'].unique()
 
 # make 3 separate datasets for 3 feature labels 
-data_0 = dataset[dataset['Sub_Cat'] == 0]
-data_1 = dataset[dataset['Sub_Cat'] == 1]
+data_0 = dataset[dataset['Label'] == 0]
+data_1 = dataset[dataset['Label'] == 1]
+data_2 = dataset[dataset['Label'] == 2]
 
 # make benign feature 
 y_0 = np.zeros(data_0.shape[0])
@@ -131,13 +132,17 @@ y_benign = pd.DataFrame(y_0)
 y_1 = np.ones(data_1.shape[0])
 y_attack_1 = pd.DataFrame(y_1)
 
+# make attack feature 
+y_2 = np.ones(data_2.shape[0])
+y_attack_2 = pd.DataFrame(y_2)
+
 # merging the original dataframe 
 # X = pd.concat([data_0, data_1, data_2], sort = True)
-X = pd.concat([data_0, data_1], sort = True)
+X = pd.concat([data_0, data_1, data_2], sort = True)
 # X = pd.concat([data_0, data_1, data_2, data_3], sort = True)
 # X = pd.concat([data_0, data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, data_9, data_10], sort = True)
 
-y = pd.concat([y_benign, y_attack_1], sort = True)
+y = pd.concat([y_benign, y_attack_1, y_attack_2], sort = True)
 # y = pd.concat([y_benign, y_attack_1, y_attack_2, y_attack_3, y_attack_4, y_attack_5, y_attack_6, y_attack_7, y_attack_8,\
     #  y_attack_9, y_attack_10], sort = True)
 # y = pd.concat([y_benign, y_attack_1, y_attack_2, y_attack_3], sort = True)
@@ -150,12 +155,13 @@ from sklearn.utils import resample
 # data_1_resample = resample(data_1, n_samples = 20000, random_state = 123, replace = True)
 data_0_resample = resample(data_0, n_samples = 20000, random_state = 123, replace = True)
 data_1_resample = resample(data_1, n_samples = 20000, random_state = 123, replace = True)
+data_2_resample = resample(data_2, n_samples = 20000, random_state = 123, replace = True)
 # data_2_resample = resample(data_2, n_samples = 20000, random_state = 123, replace = True)
 # data_3_resample = resample(data_3, n_samples = 20000, random_state = 123, replace = True)
 
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample, data_3_resample])
-train_dataset = pd.concat([data_0_resample, data_1_resample])
+train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample, data_3_resample, data_4_resample, \
 #     data_5_resample, data_6_resample, data_7_resample, data_8_resample, data_9_resample, data_10_resample])
@@ -170,32 +176,36 @@ plt.title('Intrusion Attack Type Distribution')
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'DoS attacks-SlowHTTPTest', 'DoS attacks-Hulk'], colors = ['blue', 'green', 'yellow'])
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'DoS attacks-SlowHTTPTest', 'DoS attacks-Hulk'], colors = ['blue', 'green', 'yellow'])
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'Brute Force -Web', 'Brute Force -XSS', 'SQL Injection'], colors = ['blue', 'green', 'yellow', 'pink'])
-plt.pie(train_dataset['Sub_Cat'].value_counts(), labels = ['DDoS_HTTP', 'Normal'], colors = ['black', 'white'])
+plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'FTP-BruteForce', 'SSH-Bruteforce'], colors = ['black', 'white', 'green'])
 
 p = plt.gcf()
 p.gca().add_artist(circle)
 
 # making X & Y Variables (CNN)
-test_dataset = train_dataset.sample(frac=0.1)
-target_train = train_dataset['Sub_Cat']
-target_test = test_dataset['Sub_Cat']
+test_dataset = train_dataset.sample(frac=0.2)
+target_train = train_dataset['Label']
+target_test = test_dataset['Label']
 target_train.unique(), target_test.unique()
 
 # y_train = to_categorical(target_train, num_classes = 4)
 # y_test = to_categorical(target_test, num_classes = 4)
 
-y_train = to_categorical(target_train, num_classes = 2)
-y_test = to_categorical(target_test, num_classes = 2)
+y_train = to_categorical(target_train, num_classes = 3)
+y_test = to_categorical(target_test, num_classes = 3)
 
 # Data Splicing 
 # data into train & test sets. training data used for training model, test data used 
 # to check the performance of model on unseen dataset. 
 # 80% for training and 20% for testing purpose.
-train_dataset = train_dataset.drop(columns = ["Timestamp", "Protocol", "Label", "Cat", "Flow_ID", "Src_IP", "Dst_IP"], axis = 1)
-test_dataset = test_dataset.drop(columns = ["Timestamp", "Protocol", "Label", "Cat", "Flow_ID", "Src_IP", "Dst_IP"], axis = 1)
+# train_dataset = train_dataset.drop(columns = ["Timestamp", "Protocol", "Label", "Cat", "Flow_ID", "Src_IP", "Dst_IP"], axis = 1)
+# test_dataset = test_dataset.drop(columns = ["Timestamp", "Protocol", "Label", "Cat", "Flow_ID", "Src_IP", "Dst_IP"], axis = 1)
 
 # train_dataset = train_dataset.drop(columns = ["Flow ID", "Dst IP", "Src IP" ,"Src Port", "Timestamp", "Protocol","PSH Flag Cnt","Init Fwd Win Byts","Flow Byts/s","Flow Pkts/s", "Label"], axis = 1)
 # test_dataset = test_dataset.drop(columns = ["Flow ID" , "Dst IP", "Src IP" ,"Src Port", "Timestamp", "Protocol","PSH Flag Cnt","Init Fwd Win Byts","Flow Byts/s","Flow Pkts/s", "Label"], axis = 1)
+
+train_dataset = train_dataset.drop(columns = ["Timestamp", "Protocol","PSH Flag Cnt","Init Fwd Win Byts","Flow Byts/s","Flow Pkts/s", "Label"], axis = 1)
+test_dataset = test_dataset.drop(columns = ["Timestamp", "Protocol","PSH Flag Cnt","Init Fwd Win Byts","Flow Byts/s","Flow Pkts/s", "Label"], axis = 1)
+
 
 # making train & test splits 
 X_train = train_dataset.iloc[:, : -1].values 
