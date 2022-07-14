@@ -9,7 +9,7 @@ from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
 
 # path to dataset 
-PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-14-2018.csv/02-14-2018.csv"
+# PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-14-2018.csv/02-14-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-15-2018.csv/02-15-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-16-2018.csv/02-16-2018.csv"
 
@@ -22,7 +22,7 @@ PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-14-2018.csv/02-14-2
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-01-2018.csv/03-01-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-02-2018.csv/03-02-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/02-28-2018.csv/02-28-2018.csv"
-# PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-01-2018.csv/03-01-2018.csv"
+PATH_TO_DATASET = "/mnt/d/project/dataset/cse-cic-ids2018/03-02-2018.csv/03-02-2018.csv"
 # PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/dataset.csv"
 
 # PATH_TO_DATASET = "/mnt/d/project/dataset/Bot-Iot/Bot-Iot/BoT-IoT Dataset/Theft/Keylogging/Keylogging.csv"
@@ -122,7 +122,7 @@ dataset['Label'].unique()
 # make 3 separate datasets for 3 feature labels 
 data_0 = dataset[dataset['Label'] == 0]
 data_1 = dataset[dataset['Label'] == 1]
-data_2 = dataset[dataset['Label'] == 2]
+# data_2 = dataset[dataset['Label'] == 2]
 
 # make benign feature 
 y_0 = np.zeros(data_0.shape[0])
@@ -133,16 +133,16 @@ y_1 = np.ones(data_1.shape[0])
 y_attack_1 = pd.DataFrame(y_1)
 
 # make attack feature 
-y_2 = np.ones(data_2.shape[0])
-y_attack_2 = pd.DataFrame(y_2)
+# y_2 = np.ones(data_2.shape[0])
+# y_attack_2 = pd.DataFrame(y_2)
 
 # merging the original dataframe 
 # X = pd.concat([data_0, data_1, data_2], sort = True)
-X = pd.concat([data_0, data_1, data_2], sort = True)
+X = pd.concat([data_0, data_1], sort = True)
 # X = pd.concat([data_0, data_1, data_2, data_3], sort = True)
 # X = pd.concat([data_0, data_1, data_2, data_3, data_4, data_5, data_6, data_7, data_8, data_9, data_10], sort = True)
 
-y = pd.concat([y_benign, y_attack_1, y_attack_2], sort = True)
+y = pd.concat([y_benign, y_attack_1], sort = True)
 # y = pd.concat([y_benign, y_attack_1, y_attack_2, y_attack_3, y_attack_4, y_attack_5, y_attack_6, y_attack_7, y_attack_8,\
     #  y_attack_9, y_attack_10], sort = True)
 # y = pd.concat([y_benign, y_attack_1, y_attack_2, y_attack_3], sort = True)
@@ -155,13 +155,13 @@ from sklearn.utils import resample
 # data_1_resample = resample(data_1, n_samples = 20000, random_state = 123, replace = True)
 data_0_resample = resample(data_0, n_samples = 20000, random_state = 123, replace = True)
 data_1_resample = resample(data_1, n_samples = 20000, random_state = 123, replace = True)
-data_2_resample = resample(data_2, n_samples = 20000, random_state = 123, replace = True)
+# data_2_resample = resample(data_2, n_samples = 20000, random_state = 123, replace = True)
 # data_2_resample = resample(data_2, n_samples = 20000, random_state = 123, replace = True)
 # data_3_resample = resample(data_3, n_samples = 20000, random_state = 123, replace = True)
 
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample, data_3_resample])
-train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample])
+train_dataset = pd.concat([data_0_resample, data_1_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample])
 # train_dataset = pd.concat([data_0_resample, data_1_resample, data_2_resample, data_3_resample, data_4_resample, \
 #     data_5_resample, data_6_resample, data_7_resample, data_8_resample, data_9_resample, data_10_resample])
@@ -176,7 +176,7 @@ plt.title('Intrusion Attack Type Distribution')
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'DoS attacks-SlowHTTPTest', 'DoS attacks-Hulk'], colors = ['blue', 'green', 'yellow'])
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'DoS attacks-SlowHTTPTest', 'DoS attacks-Hulk'], colors = ['blue', 'green', 'yellow'])
 # plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'Brute Force -Web', 'Brute Force -XSS', 'SQL Injection'], colors = ['blue', 'green', 'yellow', 'pink'])
-plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'FTP-BruteForce', 'SSH-Bruteforce'], colors = ['black', 'white', 'green'])
+plt.pie(train_dataset['Label'].value_counts(), labels = ['Benign', 'FTP-BruteForce'], colors = ['black', 'white', 'green'])
 
 p = plt.gcf()
 p.gca().add_artist(circle)
@@ -190,8 +190,8 @@ target_train.unique(), target_test.unique()
 # y_train = to_categorical(target_train, num_classes = 4)
 # y_test = to_categorical(target_test, num_classes = 4)
 
-y_train = to_categorical(target_train, num_classes = 3)
-y_test = to_categorical(target_test, num_classes = 3)
+y_train = to_categorical(target_train, num_classes = 2)
+y_test = to_categorical(target_test, num_classes = 2)
 
 # Data Splicing 
 # data into train & test sets. training data used for training model, test data used 
@@ -215,8 +215,8 @@ X_test = test_dataset.iloc[:, : -1].values
 # X_test = test_dataset.iloc[:, : -1]
 
 # reshape the data for CNN 
-X_train = X_train.reshape(len(X_train), X_train.shape[1], 1)
-X_test = X_test.reshape(len(X_test), X_test.shape[1], 1)
+X_train = X_train.reshape(len(X_train), X_train.shape[1])
+X_test = X_test.reshape(len(X_test), X_test.shape[1])
 
 # # view data
 # display(X_train)

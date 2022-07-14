@@ -1,4 +1,5 @@
 # import the necessary packages
+from tkinter import Y
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
@@ -6,13 +7,13 @@ from sklearn.neural_network import BernoulliRBM
 from sklearn.pipeline import Pipeline
 import numpy as np
 from keras.datasets import mnist
+import handling
 
 # dataset
-x = np.arange(10).reshape(-1, 1)
-y = np.array([0, 0, 0, 0, 1, 1, 1, 1, 1, 1])
-
-x_test = np.arange(3).reshape(-1, 1)
-y_test = np.array([0, 0, 0])
+x = handling.X_train
+y = handling.y_train
+x_test = handling.X_test
+y_test = handling.y_test
 
 # model 
 
@@ -39,6 +40,8 @@ y_test = np.array([0, 0, 0])
 # for p in sorted(params.keys()):
 # 	print("\t %s: %f" % (p, bestParams[p]))
 
+y = np.argmax(y, axis=1)
+y_test =  np.argmax(y_test, axis=1)
 
 rbm = BernoulliRBM(n_components = 50, n_iter = 20,
 learning_rate = 0.01,  verbose = True)

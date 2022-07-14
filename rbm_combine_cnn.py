@@ -274,7 +274,7 @@ import numpy as np
 
 if __name__ == '__main__':
 
-    r = BernoulliRBM(n_components = 72, n_iter = 20, learning_rate = 0.01,  verbose = True)
+    r = BernoulliRBM(n_components = 72, n_iter = 50, learning_rate = 0.1,  verbose = True)
     # reshape the data for CNN 
     X_train = handling.X_train
     X_test = handling.X_test
@@ -291,6 +291,6 @@ if __name__ == '__main__':
     underlying_feature = underlying_feature.reshape(len(underlying_feature), underlying_feature.shape[1], 1)
     underlying_feature_test = underlying_feature_test.reshape(len(underlying_feature_test), underlying_feature_test.shape[1], 1)
 
-    cnn_model(underlying_feature, y_train, underlying_feature_test, y_test)
+    # cnn_model(underlying_feature, y_train, underlying_feature_test, y_test)
 
-
+    cnn_model(X_train, y_train, X_test, y_test)
